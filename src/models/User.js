@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema(
       unique: false,
     },
     lastVisit: { type: Date, required: false },
+    courses: [],
   },
   {
     timestamps: true,

@@ -4,13 +4,15 @@ const Router = require('koa-router');
 const logger = require('./logger');
 const sessionRouter = require('./routes/session');
 const mustBeAuthenticated = require('./controllers/mustBeAuthenticated');
-const Session = require('./models/Session');
-const User = require('./models/User');
-const createSession = require('./controllers/createSession');
+const path = require('path');
+const views = require('koa-views');
 
 const app = new Koa();
-app.use(require('koa-bodyparser')());
+const render = views(path.join(__dirname, './views'));
 const router = new Router();
+
+app.use(require('koa-bodyparser')());
+app.use(render);
 
 app.use(async (ctx, next) => {
   logger.info();
@@ -31,9 +33,10 @@ app.use(async (ctx, next) => {
     }
   }
 });
-
-router.get('/grades/fetch', mustBeAuthenticated, async (ctx, next) => {
-  ctx.body = 'grades/fetch';
+// mustBeAuthenticated
+router.get('/grades/fetch', async (ctx, next) => {
+  // ctx.body = 'grades/fetch';
+  await ctx.render('list');
 });
 
 app.use(sessionRouter.routes());
