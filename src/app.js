@@ -12,7 +12,6 @@ const fs = require('fs');
 const cheerio = require('cheerio');
 const Validator = require('jsonschema').Validator;
 const redis = require('redis');
-const getGrades = require('./services/getGrades');
 
 const client = redis.createClient(config.REDIS);
 client.on('error', (err) => console.log('Redis Client Error', err));
@@ -67,7 +66,6 @@ router.get('/grades/fetch', mustBeAuthenticated, async (ctx, next) => {
   const redisData = await client.get(id);
 
   if (redisData) {
-    console.log('data from redis');
     ctx.body = redisData;
   }
 
