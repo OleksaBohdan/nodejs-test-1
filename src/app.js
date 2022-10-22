@@ -2,7 +2,6 @@ const config = require('./config/config');
 const Koa = require('koa');
 const Router = require('koa-router');
 const logger = require('./logger');
-const jwt = require('jsonwebtoken');
 const sessionRouter = require('./routes/session');
 const mustBeAuthenticated = require('./controllers/mustBeAuthenticated');
 const Session = require('./models/Session');
@@ -33,17 +32,9 @@ app.use(async (ctx, next) => {
   }
 });
 
-// router.get('/session', async (ctx, next) => {
-//   const token = jwt.sign(
-//     {
-//       exp: Math.floor(Date.now() / 1000) + 60,
-//       data: 'foobar',
-//     },
-//     config.privateKey
-//   );
-//   Session.create({ token: token, lastVisit: new Date() });
-//   ctx.body = token;
-// });
+router.get('/grades/fetch', mustBeAuthenticated, async (ctx, next) => {
+  ctx.body = 'grades/fetch';
+});
 
 app.use(sessionRouter.routes());
 app.use(router.routes());

@@ -6,10 +6,9 @@ const createSession = require('../controllers/createSession');
 
 const sessionRouter = new Router({ prefix: '/session' });
 
-sessionRouter.get('/create/', async (ctx, next) => {
+sessionRouter.get('/create', async (ctx, next) => {
   const newUser = await createUser();
   const jwtToken = await createSession(newUser);
-  logger.info(`created new user`);
   ctx.body = jwtToken;
 });
 
@@ -26,7 +25,6 @@ sessionRouter.get('/create/:id', async (ctx, next) => {
   user.lastVisit = new Date();
   await user.save();
 
-  logger.info(`searched ${user}`);
   ctx.body = user;
 });
 
