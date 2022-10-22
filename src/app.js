@@ -6,6 +6,9 @@ const sessionRouter = require('./routes/session');
 const mustBeAuthenticated = require('./controllers/mustBeAuthenticated');
 const path = require('path');
 const views = require('koa-views');
+const fs = require('fs');
+const cheerio = require('cheerio');
+const Validator = require('jsonschema').Validator;
 
 const app = new Koa();
 const render = views(path.join(__dirname, './views'));
@@ -35,8 +38,16 @@ app.use(async (ctx, next) => {
 });
 // mustBeAuthenticated
 router.get('/grades/fetch', async (ctx, next) => {
-  // ctx.body = 'grades/fetch';
-  await ctx.render('list');
+  const $ = cheerio.load(fs.readFileSync(path.join(__dirname, './views/list.html')));
+  const htmlBody = $('body').text();
+  const grades = htmlBody
+    .replace(/(\r\n|\n|\r)/gm, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  console.log(JSON.parse(grades).grades[0]);
+
+  ctx.body = grades;
 });
 
 app.use(sessionRouter.routes());
