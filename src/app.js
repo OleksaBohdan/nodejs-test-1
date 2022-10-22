@@ -11,7 +11,16 @@ const views = require('koa-views');
 const fs = require('fs');
 const cheerio = require('cheerio');
 const Validator = require('jsonschema').Validator;
+const redis = require('redis');
 const getGrades = require('./services/getGrades');
+
+const client = redis.createClient(config.REDIS);
+client.on('error', (err) => console.log('Redis Client Error', err));
+
+const runRedis = async function () {
+  await client.connect();
+  logger.info(`Redis connected ${config.REDIS}`);
+};
 
 const app = new Koa();
 const render = views(path.join(__dirname, './views'));
@@ -46,7 +55,6 @@ app.use(async (ctx, next) => {
     if (err) {
       return;
     }
-    console.log('decoded.data', decoded.data);
     ctx.userId = decoded.data;
   });
   return next();
@@ -54,9 +62,14 @@ app.use(async (ctx, next) => {
 
 router.get('/grades/fetch', mustBeAuthenticated, async (ctx, next) => {
   const id = ctx.userId;
-  console.log('id', id);
   const user = await User.findOne({ userId: id });
-  console.log('user', user);
+
+  const redisData = await client.get(id);
+
+  if (redisData) {
+    console.log('data from redis');
+    ctx.body = redisData;
+  }
 
   const $ = cheerio.load(fs.readFileSync(path.join(__dirname, './views/list.html')));
   const htmlBody = $('body').text();
@@ -72,10 +85,15 @@ router.get('/grades/fetch', mustBeAuthenticated, async (ctx, next) => {
 
   await user.save();
 
+  await client.set(id, grades, {
+    EX: 3600,
+    NX: true,
+  });
+
   ctx.body = grades;
 });
 
 app.use(sessionRouter.routes());
 app.use(router.routes());
 
-module.exports = app;
+module.exports = { app, runRedis };
