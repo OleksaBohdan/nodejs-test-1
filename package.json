@@ -4,11 +4,21 @@
   "description": "node.js task",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src index.js",
+    "dev": "nodemon ./src index.js"
   },
   "author": "Bohdan Oleksa",
   "license": "ISC",
   "dependencies": {
-    "nodemon": "^2.0.20"
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.13.4",
+    "koa-bodyparser": "^4.3.0",
+    "koa-router": "^12.0.0",
+    "mongoose": "^6.6.7",
+    "nodemon": "^2.0.20",
+    "pino": "^8.7.0",
+    "pino-pretty": "^9.1.1",
+    "redis": "^4.3.1"
   }
 }
